@@ -60,7 +60,7 @@ async def start(message: types.Message):
     Выводим пользователю стартовое ознокомительное сообщение по нашему боту.
     Разметка вывода = Markdown
     """
-    await message.answer(f"Привет, {message.from_user.full_name}! \n ")
+    await message.answer(f"Привет, {message.from_user.full_name}! \nЯ, бот для управления заказами. \n\nВведите команду /help для получения дополнительной информации.")
 
 async def main() -> None:
     bot = Bot(TOKEN)
