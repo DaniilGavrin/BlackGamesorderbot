@@ -10,8 +10,20 @@ from aiogram.filters.command import Command
 from aiogram.types import Message
 import asyncio
 import config
+import sqlite3
+
+# создаем базе данных
+class Database:
+    def __init__(self):
+        self.conn = sqlite3.connect("database.db")
+        self.cursor = self.conn.cursor()
+    
+    def create_table(self):
+        pass
+        #self.cursor.execute("""CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY, name TEXT, phone TEXT, email TEXT, password TEXT, admin INTEGER )""")
 
 TOKEN = config.TOKEN
+check_offer_done = False
 
 dp = Dispatcher()
 
@@ -26,7 +38,7 @@ async def price(message: types.Message):
     await message.answer(f'Цена: 1000 руб.')
 
 @dp.message(Command("check_offer"))
-async def price(message: types.Message):
+async def check_offer(message: types.Message):
     """
     Обрабатываем команду /check
     В команде происходит обработка состояния заказа.
@@ -35,11 +47,32 @@ async def price(message: types.Message):
 
     В случаи если данного заказа в базе нет, делаем возврат об отсутствии заказа в базе данных.
     """
-    await message.answer(f'Проверка состояния заказа')
-    await message.answer(f'Введите номер вашего заказа')
+    global check_offer_done
+    if not check_offer_done:
+        await message.answer(f'Проверка состояния заказа')
+        await message.answer(f'Введите номер вашего заказа')
+        check_offer_done = True
+
+@dp.message()
+async def check(message: types.Message):
+    global check_offer_done
+    if check_offer_done:
+        await message.answer(f'Ваш заказ: {message.text}')
+        await message.answer(f'Делаю запрос к базе данных')
+        check_offer_done = False
+        #запрашиваем user_id пользователя
+        user_id = message.from_user.id
+        await message.answer(f'Ваш id: {user_id}')
+                                
+    else:
+        await message.answer(f'Некорректный запрос!')
+                
+                
+
+    
 
 @dp.message(Command("create_offer"))
-async def price(message: types.Message):
+async def create_offer(message: types.Message):
     """
     Команда для создания заказа.
     При запуске команды запускаем стартовое сообщение, и показываем пользователю то что он может выбрать.
